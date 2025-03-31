@@ -1,0 +1,144 @@
+/* style.css */
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --box-initial-bg: #e0f7fa; 
+    --box-border-color: #b0bec5;
+    --light-text: #fff;
+    --border-radius: 4px;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+
+.container {
+    max-width: 960px;
+    margin: 20px auto; 
+    padding: 20px;
+    background-color: #c1c1c1;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--border-radius);
+}
+
+h1, h2 {
+    color: #0066ff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+   color: var(--secondary-color);
+   border-bottom: 1px solid #ffffff00;
+   padding-bottom: 10px;
+}
+
+/* Стилізація секцій */
+section {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    background-color: #fff;
+}
+
+/* Стилізація списку студентів */
+#student-list {
+    list-style: none;
+    padding: 0;
+}
+
+#student-list li {
+    background-color: #f0f0f0;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    border-left: 5px solid var(--primary-color);
+    font-size: 0.95em;
+}
+
+/* Стилізація блоку демонстрації */
+#box-demo p {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#box1 {
+    border: 1px solid var(--box-border-color);
+    margin: 20px auto; /* Центрування блоку */
+    padding: 20px;
+    text-align: center;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    transition: background-color 0.5s ease, opacity 0.5s ease, transform 0.3s ease;
+    opacity: 1; 
+    min-height: 50px; 
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+
+#box1.hidden {
+    opacity: 0;
+    transform: scale(0.9); 
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border: none;
+    overflow: hidden; 
+}
+
+
+
+#controls {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#controls button {
+    background-color: var(--primary-color);
+    color: var(--light-text);
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#controls button:hover {
+    background-color: #0056b3; /* Темніший відтінок при наведенні */
+    transform: translateY(-2px); /* Легкий підйом кнопки */
+}
+
+#controls button:active {
+    transform: translateY(1px); /* Натискання кнопки */
+}
+
+/* Стилі для кнопки Hide/Show в залежності від стану */
+#toggle-visibility-btn.show {
+    background-color: var(--secondary-color);
+}
+#toggle-visibility-btn.show:hover {
+    background-color: #5a6268;
+}
