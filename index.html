@@ -2,8 +2,49 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Зарплата</title>
+
+<!-- PWA Meta -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Зарплата">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Зарплата">
+<meta name="theme-color" content="#080d14">
+
+<!-- Иконки для разных платформ -->
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23080d14' stroke='%23334155' stroke-width='4'/><text x='90' y='115' font-size='100' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23080d14' stroke='%23334155' stroke-width='8'/><text x='256' y='320' font-size='280' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
+<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23080d14' stroke='%23334155' stroke-width='1'/><text x='16' y='22' font-size='18' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
+
+<!-- Manifest -->
+<script>
+  if ('serviceWorker' in navigator) {
+    const manifest = {
+      name: "Зарплата",
+      short_name: "Зарплата",
+      description: "Трекер зарплаты и переработок",
+      start_url: location.href,
+      display: "standalone",
+      background_color: "#080d14",
+      theme_color: "#080d14",
+      icons: [{
+        src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="128" fill="#080d14" stroke="#334155" stroke-width="8"/><text x="256" y="320" font-size="280" text-anchor="middle" fill="#4ade80">💼</text></svg>'),
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }]
+    };
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(blob);
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = manifestURL;
+    document.head.appendChild(link);
+  }
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -152,6 +193,17 @@
 
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
   .anim { animation: fadeIn .3s ease both; }
+
+  .edit-week-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted);
+    cursor: pointer; font-size: 13px; padding: 4px 8px; margin-left: 8px; transition: all .12s; }
+  .edit-week-btn:active { background: rgba(255,255,255,0.07); color: var(--text); }
+
+  .date-edit-row { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+  .date-edit-row input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
+    border-radius: 6px; padding: 6px 8px; font-size: 12px; color: var(--text);
+    font-family: var(--mono); outline: none; }
+  .date-edit-row button { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2);
+    border-radius: 6px; color: var(--green); cursor: pointer; font-size: 11px; padding: 6px 10px; font-family: var(--sans); }
 </style>
 </head>
 <body>
@@ -249,6 +301,13 @@
       <span style="width:60px"></span>
     </div>
     <div class="carry-badge" id="wd-carry-badge" style="display:none"></div>
+    <button class="edit-week-btn" id="edit-week-btn" onclick="editWeekDates()" style="display:block;margin:0 0 10px auto;">✎ Изменить даты</button>
+    <div class="date-edit-row" id="date-edit-row" style="display:none;">
+      <input type="date" id="edit-date-start" placeholder="Пн">
+      <span style="color:var(--muted);font-size:12px;">—</span>
+      <input type="date" id="edit-date-end" placeholder="Вс">
+      <button onclick="saveWeekDates()">✓ Сохранить</button>
+    </div>
     <div class="wd-summary" id="wd-summary"></div>
     <div class="section-lbl">Все записи</div>
     <div class="entries" id="wd-entries"></div>
@@ -288,6 +347,17 @@ let data = loadData();
 let currentModal = null;
 let pendingDelete = null;
 let detailWeekId = null;
+let customWeekLabels = {};
+
+// Восстанавливаем кастомные метки
+try {
+  const saved = localStorage.getItem('salary_custom_week_labels');
+  if (saved) customWeekLabels = JSON.parse(saved);
+} catch {}
+
+function saveCustomWeekLabels() {
+  try { localStorage.setItem('salary_custom_week_labels', JSON.stringify(customWeekLabels)); } catch {}
+}
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
 
@@ -302,26 +372,80 @@ function saveData() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
 }
 
+// ISO 8601: получаем дату понедельника для недели
+function getMondayOfWeek(wid) {
+  const [y, wPart] = wid.split('-W');
+  const w = parseInt(wPart);
+  // 4 января всегда в первой неделе ISO
+  const jan4 = new Date(Date.UTC(parseInt(y), 0, 4));
+  const jan4Day = jan4.getUTCDay() || 7; // Пн=1 ... Вс=7
+  const firstMonday = new Date(jan4);
+  firstMonday.setUTCDate(jan4.getUTCDate() - (jan4Day - 1));
+  const monday = new Date(firstMonday);
+  monday.setUTCDate(firstMonday.getUTCDate() + (w - 1) * 7);
+  return monday;
+}
+
 function getWeekId(date) {
   const d = date ? new Date(date) : new Date();
-  const day = d.getDay() || 7;
-  d.setDate(d.getDate() - day + 1);
-  const y = d.getFullYear();
-  const start = new Date(y, 0, 1);
-  const w = Math.ceil((((d - start) / 86400000) + 1) / 7);
-  return y + '-W' + String(w).padStart(2, '0');
+  // Приводим к UTC для расчёта ISO недели
+  const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = utc.getUTCDay() || 7;
+  utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
+  return utc.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
 }
 
 function getWeekLabel(wid) {
-  const [y, wPart] = wid.split('-W');
-  const w = parseInt(wPart);
-  const jan1 = new Date(parseInt(y), 0, 1);
-  const start = new Date(jan1.getTime() + (w - 1) * 7 * 86400000);
-  const day = start.getDay() || 7;
-  start.setDate(start.getDate() - day + 1);
-  const end = new Date(start.getTime() + 6 * 86400000);
-  const f = d => String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0');
-  return f(start) + ' — ' + f(end) + '.' + String(end.getFullYear()).slice(2);
+  if (customWeekLabels[wid]) return customWeekLabels[wid];
+
+  const monday = getMondayOfWeek(wid);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+
+  const f = d => {
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    return day + '.' + month;
+  };
+  return f(monday) + ' — ' + f(sunday) + '.' + String(sunday.getUTCFullYear()).slice(2);
+}
+
+function editWeekDates() {
+  const row = document.getElementById('date-edit-row');
+  if (row.style.display === 'none' || !row.style.display) {
+    row.style.display = 'flex';
+    const monday = getMondayOfWeek(detailWeekId);
+    const sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate() + 6);
+    const toInput = d => d.toISOString().split('T')[0];
+    document.getElementById('edit-date-start').value = toInput(monday);
+    document.getElementById('edit-date-end').value = toInput(sunday);
+  } else {
+    row.style.display = 'none';
+  }
+}
+
+function saveWeekDates() {
+  const startVal = document.getElementById('edit-date-start').value;
+  const endVal = document.getElementById('edit-date-end').value;
+  if (!startVal || !endVal) { showToast('Выбери обе даты'); return; }
+  const start = new Date(startVal);
+  const end = new Date(endVal);
+  if (end < start) { showToast('Конец раньше начала'); return; }
+  const f = d => {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return day + '.' + month;
+  };
+  const label = f(start) + ' — ' + f(end) + '.' + String(end.getFullYear()).slice(2);
+  customWeekLabels[detailWeekId] = label;
+  saveCustomWeekLabels();
+  document.getElementById('date-edit-row').style.display = 'none';
+  renderWeekDetail(detailWeekId);
+  renderHistory();
+  showToast('Даты обновлены');
 }
 
 function calcTotals(week) {
@@ -397,11 +521,9 @@ function carryOvertime() {
 }
 
 function getNextWeekId(wid) {
-  const [y, wPart] = wid.split('-W');
-  const jan1 = new Date(parseInt(y), 0, 1);
-  const start = new Date(jan1.getTime() + (parseInt(wPart) - 1) * 7 * 86400000);
-  start.setDate(start.getDate() + 7);
-  return getWeekId(start);
+  const monday = getMondayOfWeek(wid);
+  monday.setUTCDate(monday.getUTCDate() + 7);
+  return getWeekId(monday);
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
@@ -588,6 +710,7 @@ function renderHistory() {
 
 function openWeekDetail(wid) {
   detailWeekId = wid;
+  document.getElementById('date-edit-row').style.display = 'none';
   renderWeekDetail(wid);
   showPage('week');
 }
@@ -649,7 +772,6 @@ function importData(event) {
     try {
       const imported = JSON.parse(e.target.result);
       if (!imported.weeks) { showToast('Неверный формат файла'); return; }
-      // merge weeks (imported wins for same weekId)
       data.weeks = { ...data.weeks, ...imported.weeks };
       saveData();
       renderHistory();
