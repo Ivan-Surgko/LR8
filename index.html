@@ -1,340 +1,241 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Зарплата</title>
-
-<!-- PWA Meta -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Зарплата">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="Зарплата">
-<meta name="theme-color" content="#080d14">
-
-<!-- Иконки для разных платформ -->
-<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23080d14' stroke='%23334155' stroke-width='4'/><text x='90' y='115' font-size='100' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23080d14' stroke='%23334155' stroke-width='8'/><text x='256' y='320' font-size='280' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
-<link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23080d14' stroke='%23334155' stroke-width='1'/><text x='16' y='22' font-size='18' text-anchor='middle' fill='%234ade80'>💼</text></svg>">
-
-<!-- Manifest -->
-<script>
-  if ('serviceWorker' in navigator) {
-    const manifest = {
-      name: "Зарплата",
-      short_name: "Зарплата",
-      description: "Трекер зарплаты и переработок",
-      start_url: location.href,
-      display: "standalone",
-      background_color: "#080d14",
-      theme_color: "#080d14",
-      icons: [{
-        src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="128" fill="#080d14" stroke="#334155" stroke-width="8"/><text x="256" y="320" font-size="280" text-anchor="middle" fill="#4ade80">💼</text></svg>'),
-        sizes: "512x512",
-        type: "image/svg+xml",
-        purpose: "any maskable"
-      }]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(blob);
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestURL;
-    document.head.appendChild(link);
-  }
-</script>
-
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0f0f0f"/>
+<title>Расходы</title>
 <style>
-  :root {
-    --bg: #080d14;
-    --surface: rgba(255,255,255,0.03);
-    --border: rgba(255,255,255,0.06);
-    --border2: rgba(255,255,255,0.1);
-    --text: #f1f5f9;
-    --muted: #64748b;
-    --muted2: #334155;
-    --green: #4ade80;
-    --yellow: #facc15;
-    --orange: #fb923c;
-    --red: #f87171;
-    --purple: #a78bfa;
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Manrope', sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh;
-    background-image: radial-gradient(ellipse at 15% 0%, rgba(74,222,128,0.05) 0%, transparent 55%),
-                      radial-gradient(ellipse at 85% 100%, rgba(167,139,250,0.04) 0%, transparent 55%); }
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#222;--bg4:#2a2a2a;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f0f0;--muted:#888;--subtle:#555;
+  --danger:#e05252;--danger-bg:rgba(224,82,82,0.12);
+  --green:#4caf7d;--green-bg:rgba(76,175,125,0.12);
+  --orange:#e8923a;--blue:#5b9cf6;
+  --r:12px;--rs:8px;--rxs:6px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;padding-bottom:5rem}
+#app{max-width:480px;margin:0 auto;padding:0 1rem}
 
-  .app { max-width: 420px; margin: 0 auto; padding: 0 16px 60px; }
+/* ── TABS ── */
+.tabs{display:flex;background:var(--bg2);border-radius:var(--r);padding:4px;margin:1rem 0;border:0.5px solid var(--border)}
+.tab{flex:1;height:36px;border:none;background:transparent;color:var(--muted);font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--rs);font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab.active{background:var(--bg4);color:var(--text)}
+.screen{display:none}.screen.active{display:block}
 
-  /* TOP BAR */
-  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 18px; }
-  .topbar-left .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 3px; }
-  .topbar-left .week { font-size: 17px; font-weight: 700; color: var(--text); }
-  .topbar-right { display: flex; gap: 8px; }
-  .icon-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    width: 38px; height: 38px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all .15s; }
-  .icon-btn:active { background: rgba(255,255,255,0.07); transform: scale(.95); }
+/* ── TOTAL CARD ── */
+.total-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:.75rem}
+.total-row{display:flex;justify-content:space-between;align-items:flex-start}
+.total-label{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.total-big{font-size:34px;font-weight:600;letter-spacing:-.5px;line-height:1}
+.total-cur{font-size:17px;color:var(--muted);font-weight:400}
+.total-count{font-size:12px;color:var(--muted);text-align:right}
+.budget-bar-wrap{margin-top:12px}
+.budget-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px}
+.budget-bar-bg{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.budget-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.budget-set-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.budget-inp{flex:1;height:34px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rxs);color:var(--text);font-size:14px;padding:0 10px;outline:none;font-family:inherit}
+.btn-sm{height:34px;padding:0 12px;font-size:13px;background:var(--bg4);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--rxs);cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-sm:active{opacity:.7}
 
-  /* CARRY BADGE */
-  .carry-badge { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2);
-    border-radius: 8px; padding: 8px 12px; font-size: 13px; color: var(--orange); margin-bottom: 12px; }
+/* ── ADD FORM ── */
+.add-form{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:.75rem;display:flex;flex-direction:column;gap:8px}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat-btn{height:30px;padding:0 10px;border-radius:20px;border:0.5px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;font-family:inherit;transition:all .13s;white-space:nowrap}
+.cat-btn.selected{border-color:var(--blue);color:var(--blue);background:rgba(91,156,246,.1)}
+.form-row{display:flex;gap:6px;align-items:center}
+input[type=text],input[type=number]{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--rs);color:var(--text);font-size:16px;padding:0 12px;height:46px;outline:none;width:100%;font-family:inherit;-webkit-appearance:none}
+input::placeholder{color:var(--subtle)}
+input:focus{border-color:rgba(255,255,255,.28)}
+.inp-qty{width:42px;min-width:42px;max-width: 130px;flex-shrink:0;text-align:center;padding:0 4px}
+.qty-sep{color:var(--muted);font-size:14px;flex-shrink:0;user-select:none;margin:0 2px}
+.inp-price{min-width:0;max-width: 130px;flex:1}
+.btn-add{height:46px;padding:0 16px;background:var(--text);color:var(--bg);border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.btn-add:active{opacity:.75}
 
-  /* SUMMARY */
-  .summary { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-  .summary-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px; }
-  .sum-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .big-num { font-family: var(--mono); font-size: 42px; font-weight: 800; color: var(--text); line-height: 1; }
-  .big-num span { font-size: 22px; color: var(--muted); }
-  .to-receive { font-size: 15px; font-weight: 700; color: var(--green); font-family: var(--mono); }
-  .advance-sub { font-size: 12px; color: var(--purple); margin-bottom: 2px; }
-  .divider { height: 1px; background: var(--border); margin: 12px 0; }
-  .mini-stats { display: flex; gap: 18px; flex-wrap: wrap; }
-  .mini-stat .ms-lbl { font-size: 11px; color: var(--muted2); margin-bottom: 2px; }
-  .mini-stat .ms-val { font-family: var(--mono); font-size: 15px; font-weight: 600; }
+/* ── ITEMS ── */
+.section-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;padding:0 2px}
+.items-list{display:flex;flex-direction:column;gap:5px}
+.item-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:center;gap:8px;animation:sli .15s ease}
+@keyframes sli{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.item-right{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;gap:2px}
+.item-total{font-size:15px;font-weight:500;white-space:nowrap}
+.item-cur{font-size:11px;color:var(--muted);margin-left:1px}
+.item-cat-tag{font-size:10px;color:var(--muted);border:0.5px solid var(--border);border-radius:4px;padding:1px 5px;white-space:nowrap}
+.btn-del{width:30px;height:30px;border:none;background:transparent;color:var(--subtle);cursor:pointer;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;-webkit-tap-highlight-color:transparent}
+.btn-del:active{background:var(--danger-bg);color:var(--danger)}
 
-  /* BUTTONS GRID */
-  .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-  .action-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; text-align: left;
-    transition: background .12s, transform .1s; }
-  .action-card:active { background: rgba(255,255,255,0.06); transform: scale(.97); }
-  .action-card .ac-icon { font-size: 20px; width: 26px; flex-shrink: 0; }
-  .action-card .ac-name { font-size: 13px; font-weight: 600; color: var(--text); }
-  .action-card .ac-sub { font-size: 11px; color: var(--muted2); margin-top: 1px; }
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px}
+.empty-icon{font-size:38px;margin-bottom:10px;opacity:.35}
 
-  /* CARRY BTN */
-  .carry-btn { width: 100%; background: rgba(251,146,60,0.07); border: 1px solid rgba(251,146,60,0.2);
-    border-radius: 10px; padding: 10px; color: var(--orange); font-size: 13px; cursor: pointer;
-    font-family: var(--sans); margin-bottom: 8px; transition: background .12s; }
-  .carry-btn:active { background: rgba(251,146,60,0.14); }
+.list-footer{display:flex;gap:8px;margin-top:1rem;justify-content:flex-end}
+.btn-save{height:40px;padding:0 18px;font-size:14px;font-weight:500;background:var(--green-bg);color:var(--green);border:0.5px solid rgba(76,175,125,.35);border-radius:var(--rs);cursor:pointer;font-family:inherit}
+.btn-save:active{opacity:.75}
+.btn-clear{height:40px;padding:0 14px;font-size:13px;color:var(--danger);background:transparent;border:0.5px solid rgba(224,82,82,.3);border-radius:var(--rs);cursor:pointer;font-family:inherit}
+.btn-clear:active{background:var(--danger-bg)}
 
-  /* RECENT */
-  .section-lbl { font-size: 11px; color: var(--muted2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; margin-top: 16px; }
-  .entries { display: flex; flex-direction: column; gap: 5px; }
-  .entry-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; }
-  .e-icon { font-size: 15px; width: 22px; flex-shrink: 0; text-align: center; }
-  .e-label { flex: 1; font-size: 13px; color: #cbd5e1; }
-  .del-btn { background: none; border: none; color: var(--muted2); cursor: pointer; font-size: 13px; padding: 3px 5px; border-radius: 4px; transition: color .12s; }
-  .del-btn:active { color: var(--red); }
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r) var(--r) 0 0;padding:1.5rem 1.25rem 2.5rem;width:100%;max-width:480px;animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(60px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1rem}
+.modal input{width:100%;margin-bottom:10px}
+.modal-btns{display:flex;gap:8px;margin-top:4px}
+.btn-confirm{flex:1;height:46px;background:var(--text);color:var(--bg);border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-cancel{height:46px;padding:0 18px;background:transparent;color:var(--muted);border:0.5px solid var(--border2);border-radius:var(--rs);font-size:15px;cursor:pointer;font-family:inherit}
 
-  /* OVERLAY */
-  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex;
-    align-items: flex-end; justify-content: center; z-index: 100; backdrop-filter: blur(5px); opacity: 0;
-    pointer-events: none; transition: opacity .2s; }
-  .overlay.open { opacity: 1; pointer-events: all; }
-  .modal { background: #0e1520; border: 1px solid var(--border2); border-radius: 20px 20px 0 0;
-    padding: 24px 20px 40px; width: 100%; max-width: 420px; transform: translateY(30px);
-    transition: transform .25s cubic-bezier(.22,1,.36,1); }
-  .overlay.open .modal { transform: translateY(0); }
-  .modal-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
-  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 18px; line-height: 1.5; }
-  .modal input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
-    border-radius: 10px; padding: 13px 14px; font-size: 22px; color: var(--text);
-    font-family: var(--mono); outline: none; }
-  .modal input:focus { border-color: rgba(255,255,255,0.2); }
-  .modal-btns { display: flex; gap: 10px; margin-top: 14px; }
-  .m-btn { flex: 1; border: 1px solid var(--border); border-radius: 10px; padding: 12px;
-    font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--sans); transition: all .12s; }
-  .m-btn:active { transform: scale(.97); }
-  .m-btn-confirm { background: rgba(74,222,128,0.1); color: var(--green); border-color: rgba(74,222,128,0.2); }
-  .m-btn-cancel { background: var(--surface); color: var(--muted); }
-  .m-btn-danger { background: rgba(248,113,113,0.1); color: var(--red); border-color: rgba(248,113,113,0.2); }
+/* ── HISTORY ── */
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem}
+.stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:1rem 1.1rem}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.stat-val{font-size:22px;font-weight:600}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px}
 
-  /* HISTORY */
-  .page { display: none; }
-  .page.active { display: block; }
-  .hist-topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 0 18px; }
-  .back-btn { background: none; border: none; color: var(--green); font-size: 14px; font-weight: 600;
-    cursor: pointer; font-family: var(--sans); padding: 0; }
-  .hist-title { font-size: 16px; font-weight: 700; color: var(--text); }
-  .hist-cards { display: flex; flex-direction: column; gap: 10px; }
-  .hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-    padding: 14px; cursor: pointer; transition: background .12s; }
-  .hist-card:active { background: rgba(255,255,255,0.06); }
-  .hist-card.current { border-color: rgba(74,222,128,0.35); }
-  .hist-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-  .hist-wlbl { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
-  .hist-badge { font-size: 10px; background: rgba(74,222,128,0.12); color: var(--green);
-    border-radius: 4px; padding: 2px 7px; text-transform: uppercase; letter-spacing: .5px; }
-  .hist-amount { font-family: var(--mono); font-size: 20px; font-weight: 700; }
-  .hist-adv { font-size: 12px; color: var(--purple); text-align: right; margin-top: 2px; }
-  .hist-types { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
-  .hist-type-dot { font-size: 12px; }
-  .empty { text-align: center; color: var(--muted2); font-size: 14px; padding: 40px 0; }
+.history-actions{display:flex;gap:8px;margin-bottom:.75rem}
+.btn-export{flex:1;height:38px;font-size:13px;background:var(--bg2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--rs);cursor:pointer;font-family:inherit}
+.btn-export:active{opacity:.7}
+.btn-import-wrap{position:relative;flex:1}
+.btn-import-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.btn-import{width:100%;height:38px;font-size:13px;background:var(--bg2);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--rs);cursor:pointer;font-family:inherit;pointer-events:none}
+.db-badge{text-align:center;font-size:11px;color:var(--subtle);margin-bottom:.75rem;padding:6px;background:var(--bg2);border-radius:var(--rxs);border:0.5px solid var(--border)}
 
-  /* WEEK DETAIL */
-  .wd-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
-  .wd-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
-  .wd-row-lbl { font-size: 13px; color: var(--muted); }
-  .wd-row-val { font-family: var(--mono); font-size: 14px; font-weight: 600; }
-  .wd-row.big .wd-row-lbl { font-size: 14px; color: #94a3b8; }
-  .wd-row.big .wd-row-val { font-size: 17px; font-weight: 700; }
+.receipt-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.receipt-head{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.receipt-head:active{background:var(--bg3)}
+.receipt-icon{font-size:20px;flex-shrink:0}
+.receipt-info{flex:1;min-width:0}
+.receipt-name{font-size:15px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.receipt-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.receipt-total{font-size:15px;font-weight:600;white-space:nowrap;margin-right:4px}
+.receipt-arrow{color:var(--subtle);font-size:12px;transition:transform .2s;flex-shrink:0}
+.receipt-arrow.open{transform:rotate(180deg)}
+.receipt-body{display:none;border-top:0.5px solid var(--border);padding:10px 14px 12px}
+.receipt-body.open{display:block}
+.receipt-note{font-size:12px;color:var(--muted);margin-bottom:10px;font-style:italic;padding:6px 8px;background:var(--bg3);border-radius:var(--rxs)}
+.r-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+.r-item:last-child{border-bottom:none}
+.r-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.r-info{flex:1;min-width:0}
+.r-name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-qty-line{font-size:11px;color:var(--muted);margin-top:1px}
+.r-cat{font-size:10px;color:var(--muted);border:0.5px solid var(--border);border-radius:4px;padding:1px 5px;flex-shrink:0}
+.r-price{font-size:14px;font-weight:500;white-space:nowrap;flex-shrink:0}
+.r-cur{font-size:10px;color:var(--muted)}
 
-  /* DATA BUTTONS */
-  .data-btns { display: flex; gap: 8px; margin-bottom: 14px; }
-  .data-btn { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 9px 6px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer;
-    font-family: var(--sans); display: flex; align-items: center; justify-content: center; gap: 5px; transition: all .12s; }
-  .data-btn:active { background: rgba(255,255,255,0.07); }
-  .data-btn.export { color: var(--green); border-color: rgba(74,222,128,0.2); background: rgba(74,222,128,0.05); }
-  .data-btn.import { color: var(--purple); border-color: rgba(167,139,250,0.2); background: rgba(167,139,250,0.05); }
+/* cat breakdown */
+.cat-breakdown{margin-top:10px;padding-top:10px;border-top:0.5px solid var(--border)}
+.cat-breakdown-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.cat-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.cat-row-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cat-row-name{font-size:12px;color:var(--muted);flex:1}
+.cat-row-bar-bg{flex:2;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.cat-row-bar{height:100%;border-radius:2px}
+.cat-row-val{font-size:12px;font-weight:500;white-space:nowrap;min-width:50px;text-align:right}
 
-  /* TOAST */
-  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: #1e293b; border: 1px solid var(--border2); border-radius: 20px;
-    padding: 10px 22px; font-size: 13px; color: var(--text); z-index: 200;
-    white-space: nowrap; box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-    opacity: 0; transition: all .25s cubic-bezier(.22,1,.36,1); pointer-events: none; }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.receipt-actions{display:flex;justify-content:flex-end;margin-top:10px}
+.btn-receipt-del{height:32px;padding:0 12px;font-size:12px;color:var(--danger);background:transparent;border:0.5px solid rgba(224,82,82,.3);border-radius:var(--rxs);cursor:pointer;font-family:inherit}
+.btn-receipt-del:active{background:var(--danger-bg)}
+.no-history{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px}
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  .anim { animation: fadeIn .3s ease both; }
-
-  .edit-week-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--muted);
-    cursor: pointer; font-size: 13px; padding: 4px 8px; margin-left: 8px; transition: all .12s; }
-  .edit-week-btn:active { background: rgba(255,255,255,0.07); color: var(--text); }
-
-  .date-edit-row { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
-  .date-edit-row input { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--border2);
-    border-radius: 6px; padding: 6px 8px; font-size: 12px; color: var(--text);
-    font-family: var(--mono); outline: none; }
-  .date-edit-row button { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2);
-    border-radius: 6px; color: var(--green); cursor: pointer; font-size: 11px; padding: 6px 10px; font-family: var(--sans); }
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg4);color:var(--text);border:0.5px solid var(--border2);border-radius:var(--rs);padding:10px 20px;font-size:14px;opacity:0;transition:all .25s;pointer-events:none;z-index:200;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
-<div class="app">
+<div id="app">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('list')" id="tab-list">🛒 Список</button>
+    <button class="tab" onclick="switchTab('history')" id="tab-history">📋 История</button>
+  </div>
 
-  <!-- MAIN PAGE -->
-  <div class="page active" id="page-main">
-    <div class="topbar">
-      <div class="topbar-left">
-        <div class="lbl">Текущая неделя</div>
-        <div class="week" id="main-week-label">—</div>
-      </div>
-      <div class="topbar-right">
-        <button class="icon-btn" onclick="showPage('history')" title="История">📋</button>
-      </div>
-    </div>
-
-    <div class="carry-badge anim" id="carry-badge" style="display:none"></div>
-
-    <div class="summary anim">
-      <div class="summary-top">
+  <!-- ── LIST ── -->
+  <div class="screen active" id="screen-list">
+    <div class="total-card">
+      <div class="total-row">
         <div>
-          <div class="sum-label">Заработано</div>
-          <div class="big-num"><span id="main-total">0</span><span>₴</span></div>
+          <div class="total-label">Текущий список</div>
+          <div>
+            <span class="total-big" id="total-val">0.00</span>
+            <span class="total-cur"> ₴</span>
+          </div>
         </div>
-        <div id="advance-block" style="text-align:right;display:none">
-          <div class="advance-sub" id="advance-sub-text"></div>
-          <div class="to-receive" id="to-receive-text"></div>
+        <div>
+          <div class="total-count" id="total-count">0 позиций</div>
+          <div id="budget-left-badge" style="font-size:12px;text-align:right;margin-top:4px"></div>
         </div>
       </div>
-      <div class="divider"></div>
-      <div class="mini-stats">
-        <div class="mini-stat"><div class="ms-lbl">Рабочих</div><div class="ms-val" style="color:var(--green)" id="ms-days">0 дн</div></div>
-        <div class="mini-stat"><div class="ms-lbl">Переработка</div><div class="ms-val" style="color:var(--orange)" id="ms-ot">0₴</div></div>
-        <div class="mini-stat"><div class="ms-lbl">Остаток</div><div class="ms-val" style="color:var(--yellow)" id="ms-rem">0г</div></div>
-        <div class="mini-stat" id="ms-ded-block" style="display:none"><div class="ms-lbl">Вычеты</div><div class="ms-val" style="color:var(--red)" id="ms-ded">0₴</div></div>
+      <div class="budget-bar-wrap" id="budget-wrap" style="display:none">
+        <div class="budget-meta">
+          <span>Бюджет</span>
+          <span id="budget-meta-text"></span>
+        </div>
+        <div class="budget-bar-bg">
+          <div class="budget-bar-fill" id="budget-bar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="budget-set-row">
+        <input type="number" class="budget-inp" id="budget-inp" placeholder="Установить бюджет ₴" inputmode="decimal" min="0"/>
+        <button class="btn-sm" onclick="setBudget()">Задать</button>
+        <button class="btn-sm" id="budget-clear-btn" onclick="clearBudget()" style="display:none;color:var(--muted)">✕</button>
       </div>
     </div>
 
-    <div class="btn-grid">
-      <button class="action-card" onclick="addWorkday()">
-        <div class="ac-icon" style="color:var(--green)">✓</div>
-        <div><div class="ac-name">Рабочий день</div><div class="ac-sub">650₴ за смену</div></div>
-      </button>
-      <button class="action-card" onclick="addDayOff()">
-        <div class="ac-icon" style="color:var(--muted)">○</div>
-        <div><div class="ac-name">Выходной</div><div class="ac-sub">отдых</div></div>
-      </button>
-      <button class="action-card" onclick="openModal('short')">
-        <div class="ac-icon" style="color:var(--yellow)">◑</div>
-        <div><div class="ac-name">Неполный день</div><div class="ac-sub">→ переработка</div></div>
-      </button>
-      <button class="action-card" onclick="openModal('overtime')">
-        <div class="ac-icon" style="color:var(--orange)">⊕</div>
-        <div><div class="ac-name">Переработка</div><div class="ac-sub">+часы</div></div>
-      </button>
-      <button class="action-card" onclick="openModal('deduction')">
-        <div class="ac-icon" style="color:var(--red)">↓</div>
-        <div><div class="ac-name">Вычет</div><div class="ac-sub">−сумма</div></div>
-      </button>
-      <button class="action-card" onclick="openModal('advance')">
-        <div class="ac-icon" style="color:var(--purple)">↑</div>
-        <div><div class="ac-name">Аванс</div><div class="ac-sub">получено</div></div>
-      </button>
-    </div>
+    <div class="add-form">
+		<div class="cats" id="cats-row"></div>
+		<div class="form-row">
+    <input type="text" id="inp-name" placeholder="Название товара" maxlength="60" autocomplete="off" autocorrect="off"/>
+  </div>
+  <div class="form-row">
+    <input type="number" id="inp-qty" class="inp-qty" value="1" min="1" step="1" inputmode="numeric" title="Количество"/>
+    <span class="qty-sep">×</span>
+    <input type="number" id="inp-price" class="inp-price" placeholder="Цена ₴" min="0" step="0.01" inputmode="decimal"/>
+    <button class="btn-add" onclick="addItem()">+ Добавить</button>
+  </div>
+</div>
 
-    <button class="carry-btn" id="carry-btn" onclick="carryOvertime()" style="display:none"></button>
-
-    <div id="recent-block" style="display:none">
-      <div class="section-lbl">Последние записи</div>
-      <div class="entries" id="recent-list"></div>
+    <div class="section-label" id="list-label" style="display:none">Список покупок</div>
+    <div class="items-list" id="items-list"></div>
+    <div class="list-footer" id="list-footer" style="display:none">
+      <button class="btn-clear" onclick="clearAll()">🗑 Сбросить</button>
+      <button class="btn-save" onclick="openSaveModal()">💾 Сохранить чек</button>
     </div>
   </div>
 
-  <!-- HISTORY PAGE -->
-  <div class="page" id="page-history">
-    <div class="hist-topbar">
-      <button class="back-btn" onclick="showPage('main')">← Назад</button>
-      <span class="hist-title">История</span>
-      <span style="width:60px"></span>
+  <!-- ── HISTORY ── -->
+  <div class="screen" id="screen-history">
+    <div class="stats-row" id="stats-row"></div>
+    <div class="history-actions">
+      <button class="btn-export" onclick="exportJSON()">⬇ Экспорт JSON</button>
+      <div class="btn-import-wrap">
+        <button class="btn-import">⬆ Импорт JSON</button>
+        <input type="file" accept=".json" onchange="importJSON(event)"/>
+      </div>
     </div>
-    <div class="data-btns">
-      <button class="data-btn export" onclick="exportData()">⬇ Экспорт JSON</button>
-      <button class="data-btn import" onclick="document.getElementById('import-input').click()">⬆ Импорт JSON</button>
-      <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
-    </div>
-    <div class="hist-cards" id="hist-cards"></div>
-  </div>
-
-  <!-- WEEK DETAIL PAGE -->
-  <div class="page" id="page-week">
-    <div class="hist-topbar">
-      <button class="back-btn" onclick="showPage('history')">← Назад</button>
-      <span class="hist-title" id="wd-title">—</span>
-      <span style="width:60px"></span>
-    </div>
-    <div class="carry-badge" id="wd-carry-badge" style="display:none"></div>
-    <button class="edit-week-btn" id="edit-week-btn" onclick="editWeekDates()" style="display:block;margin:0 0 10px auto;">✎ Изменить даты</button>
-    <div class="date-edit-row" id="date-edit-row" style="display:none;">
-      <input type="date" id="edit-date-start" placeholder="Пн">
-      <span style="color:var(--muted);font-size:12px;">—</span>
-      <input type="date" id="edit-date-end" placeholder="Вс">
-      <button onclick="saveWeekDates()">✓ Сохранить</button>
-    </div>
-    <div class="wd-summary" id="wd-summary"></div>
-    <div class="section-lbl">Все записи</div>
-    <div class="entries" id="wd-entries"></div>
+    <div class="db-badge" id="db-badge">📦 IndexedDB — история хранится в базе браузера</div>
+    <div class="section-label">Сохранённые чеки</div>
+    <div id="history-list"></div>
   </div>
 </div>
 
 <!-- MODAL -->
-<div class="overlay" id="modal-overlay" onclick="closeModal()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title" id="modal-title">—</div>
-    <div class="modal-sub" id="modal-sub">—</div>
-    <input type="number" inputmode="decimal" id="modal-input" placeholder="0" onkeydown="if(event.key==='Enter')modalConfirm()">
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title">Сохранить чек</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <input type="text" id="modal-label" placeholder='Название: "АТБ, 9 мая"' maxlength="60" autocomplete="off"/>
+    <input type="text" id="modal-note" placeholder='Заметка (необязательно)' maxlength="120" autocomplete="off"/>
     <div class="modal-btns">
-      <button class="m-btn m-btn-confirm" onclick="modalConfirm()">Добавить</button>
-      <button class="m-btn m-btn-cancel" onclick="closeModal()">Отмена</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFIRM DELETE MODAL -->
-<div class="overlay" id="del-overlay" onclick="closeDelModal()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title">Удалить запись?</div>
-    <div class="modal-sub" id="del-sub" style="color:var(--muted)">—</div>
-    <div class="modal-btns">
-      <button class="m-btn m-btn-danger" onclick="confirmDelete()">Удалить</button>
-      <button class="m-btn m-btn-cancel" onclick="closeDelModal()">Отмена</button>
+      <button class="btn-cancel" onclick="closeModalDirect()">Отмена</button>
+      <button class="btn-confirm" onclick="saveReceipt()">Сохранить</button>
     </div>
   </div>
 </div>
@@ -342,460 +243,412 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const STORAGE_KEY = 'salary_v2';
-let data = loadData();
-let currentModal = null;
-let pendingDelete = null;
-let detailWeekId = null;
-let customWeekLabels = {};
+/* ════════════════════════════════════════
+   IndexedDB
+════════════════════════════════════════ */
+const DB_NAME = 'expenses_db';
+const DB_VER  = 1;
+let db = null;
 
-// Восстанавливаем кастомные метки
-try {
-  const saved = localStorage.getItem('salary_custom_week_labels');
-  if (saved) customWeekLabels = JSON.parse(saved);
-} catch {}
-
-function saveCustomWeekLabels() {
-  try { localStorage.setItem('salary_custom_week_labels', JSON.stringify(customWeekLabels)); } catch {}
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('receipts'))
+        d.createObjectStore('receipts', {keyPath:'id'});
+    };
+    req.onsuccess = e => { db = e.target.result; res(); };
+    req.onerror   = e => rej(e);
+  });
 }
 
-// ── DATA ──────────────────────────────────────────────────────────────────────
-
-function loadData() {
-  try {
-    const s = localStorage.getItem(STORAGE_KEY);
-    return s ? JSON.parse(s) : { weeks: {} };
-  } catch { return { weeks: {} }; }
+function dbGetAll() {
+  return new Promise((res, rej) => {
+    const req = db.transaction('receipts','readonly').objectStore('receipts').getAll();
+    req.onsuccess = () => res(req.result.sort((a,b)=>b.id-a.id));
+    req.onerror   = e => rej(e);
+  });
+}
+function dbAdd(r) {
+  return new Promise((res, rej) => {
+    const req = db.transaction('receipts','readwrite').objectStore('receipts').add(r);
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e);
+  });
+}
+function dbDel(id) {
+  return new Promise((res, rej) => {
+    const req = db.transaction('receipts','readwrite').objectStore('receipts').delete(id);
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e);
+  });
+}
+function dbPut(r) {
+  return new Promise((res, rej) => {
+    const req = db.transaction('receipts','readwrite').objectStore('receipts').put(r);
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e);
+  });
 }
 
-function saveData() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+/* ════════════════════════════════════════
+   State
+════════════════════════════════════════ */
+const SK_ITEMS  = 'exp_items';
+const SK_BUDGET = 'exp_budget';
+const CATS = [
+  {id:'food',      label:'🍞 Еда',        color:'#5b9cf6'},
+  {id:'transport', label:'🚌 Транспорт',   color:'#e8923a'},
+  {id:'build',     label:'🔨 Стройка',     color:'#c97bff'},
+  {id:'medicine',  label:'💊 Лекарство',         color:'#4caf7d'},
+  {id:'other',     label:'💬 Другое',      color:'#888'},
+];
+
+let items  = lsGet(SK_ITEMS,  []);
+let budget = lsGet(SK_BUDGET, null);
+let selCat = null;
+
+function lsGet(k,d){try{const r=localStorage.getItem(k);return r?JSON.parse(r):d;}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+function catColor(id){return(CATS.find(c=>c.id===id)||CATS[4]).color;}
+function catLabel(id){return(CATS.find(c=>c.id===id)||CATS[4]).label;}
+function catShort(id){const p=catLabel(id).split(' ');return p.slice(1).join(' ')||p[0];}
+
+/* ════════════════════════════════════════
+   Tabs
+════════════════════════════════════════ */
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('screen-'+t).classList.add('active');
+  if (t==='history') renderHistory();
 }
 
-// ISO 8601: получаем дату понедельника для недели
-function getMondayOfWeek(wid) {
-  const [y, wPart] = wid.split('-W');
-  const w = parseInt(wPart);
-  // 4 января всегда в первой неделе ISO
-  const jan4 = new Date(Date.UTC(parseInt(y), 0, 4));
-  const jan4Day = jan4.getUTCDay() || 7; // Пн=1 ... Вс=7
-  const firstMonday = new Date(jan4);
-  firstMonday.setUTCDate(jan4.getUTCDate() - (jan4Day - 1));
-  const monday = new Date(firstMonday);
-  monday.setUTCDate(firstMonday.getUTCDate() + (w - 1) * 7);
-  return monday;
+/* ════════════════════════════════════════
+   Categories
+════════════════════════════════════════ */
+function renderCats() {
+  document.getElementById('cats-row').innerHTML = CATS.map(c=>
+    `<button class="cat-btn${selCat===c.id?' selected':''}" onclick="selectCat('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+function selectCat(id){selCat=(selCat===id)?null:id;renderCats();}
+
+/* ════════════════════════════════════════
+   Budget
+════════════════════════════════════════ */
+function setBudget(){
+  const v=parseFloat(document.getElementById('budget-inp').value);
+  if(isNaN(v)||v<=0)return;
+  budget=v;lsSet(SK_BUDGET,budget);
+  document.getElementById('budget-inp').value='';
+  renderList();
+}
+function clearBudget(){budget=null;lsSet(SK_BUDGET,null);renderList();}
+
+/* ════════════════════════════════════════
+   Add / Delete
+════════════════════════════════════════ */
+function addItem(){
+  const nEl=document.getElementById('inp-name');
+  const qEl=document.getElementById('inp-qty');
+  const pEl=document.getElementById('inp-price');
+  const name=nEl.value.trim();
+  const qty=parseInt(qEl.value);
+  const price=parseFloat(pEl.value);
+  if(!name){nEl.focus();return;}
+  if(isNaN(qty)||qty<1){qEl.focus();qEl.value='1';return;}
+  if(isNaN(price)||price<0){pEl.focus();return;}
+  const now=new Date();
+  items.unshift({
+    id:Date.now(), name,
+    qty: Math.max(1,qty),
+    price,
+    total: Math.round(qty*price*100)/100,
+    cat: selCat||'other',
+    time: now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})
+  });
+  nEl.value=''; qEl.value='1'; pEl.value='';
+  nEl.focus();
+  lsSet(SK_ITEMS,items);
+  renderList();
 }
 
-function getWeekId(date) {
-  const d = date ? new Date(date) : new Date();
-  // Приводим к UTC для расчёта ISO недели
-  const utc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dayNum = utc.getUTCDay() || 7;
-  utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
-  const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
-  return utc.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
+function deleteItem(id){items=items.filter(i=>i.id!==id);lsSet(SK_ITEMS,items);renderList();}
+
+function clearAll(){
+  if(!confirm('Сбросить текущий список?'))return;
+  items=[];lsSet(SK_ITEMS,items);renderList();
 }
 
-function getWeekLabel(wid) {
-  if (customWeekLabels[wid]) return customWeekLabels[wid];
+/* ════════════════════════════════════════
+   Render List
+════════════════════════════════════════ */
+function renderList(){
+  const total=items.reduce((s,i)=>s+i.total,0);
+  document.getElementById('total-val').textContent=total.toFixed(2);
+  document.getElementById('total-count').textContent=
+    items.length+' '+plural(items.length,'позиция','позиции','позиций');
 
-  const monday = getMondayOfWeek(wid);
-  const sunday = new Date(monday);
-  sunday.setUTCDate(monday.getUTCDate() + 6);
+  // budget
+  const bw=document.getElementById('budget-wrap');
+  const bcb=document.getElementById('budget-clear-btn');
+  const badge=document.getElementById('budget-left-badge');
+  if(budget){
+    bw.style.display='block';bcb.style.display='';
+    const pct=Math.min(total/budget*100,100);
+    const bar=document.getElementById('budget-bar');
+    bar.style.width=pct+'%';
+    bar.style.background=pct>=100?'var(--danger)':pct>=80?'var(--orange)':'var(--green)';
+    document.getElementById('budget-meta-text').textContent=total.toFixed(0)+' / '+budget.toFixed(0)+' ₴';
+    const left=budget-total;
+    badge.textContent=left>=0?'Осталось: '+left.toFixed(0)+' ₴':'Перерасход: '+Math.abs(left).toFixed(0)+' ₴';
+    badge.style.color=left>=0?'var(--green)':'var(--danger)';
+  }else{bw.style.display='none';bcb.style.display='none';badge.textContent='';}
 
-  const f = d => {
-    const day = String(d.getUTCDate()).padStart(2, '0');
-    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
-    return day + '.' + month;
-  };
-  return f(monday) + ' — ' + f(sunday) + '.' + String(sunday.getUTCFullYear()).slice(2);
-}
+  const listEl=document.getElementById('items-list');
+  const labelEl=document.getElementById('list-label');
+  const footerEl=document.getElementById('list-footer');
 
-function editWeekDates() {
-  const row = document.getElementById('date-edit-row');
-  if (row.style.display === 'none' || !row.style.display) {
-    row.style.display = 'flex';
-    const monday = getMondayOfWeek(detailWeekId);
-    const sunday = new Date(monday);
-    sunday.setUTCDate(monday.getUTCDate() + 6);
-    const toInput = d => d.toISOString().split('T')[0];
-    document.getElementById('edit-date-start').value = toInput(monday);
-    document.getElementById('edit-date-end').value = toInput(sunday);
-  } else {
-    row.style.display = 'none';
+  if(!items.length){
+    labelEl.style.display='none';footerEl.style.display='none';
+    listEl.innerHTML='<div class="empty"><div class="empty-icon">🛒</div>Список пуст</div>';
+    return;
   }
-}
-
-function saveWeekDates() {
-  const startVal = document.getElementById('edit-date-start').value;
-  const endVal = document.getElementById('edit-date-end').value;
-  if (!startVal || !endVal) { showToast('Выбери обе даты'); return; }
-  const start = new Date(startVal);
-  const end = new Date(endVal);
-  if (end < start) { showToast('Конец раньше начала'); return; }
-  const f = d => {
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    return day + '.' + month;
-  };
-  const label = f(start) + ' — ' + f(end) + '.' + String(end.getFullYear()).slice(2);
-  customWeekLabels[detailWeekId] = label;
-  saveCustomWeekLabels();
-  document.getElementById('date-edit-row').style.display = 'none';
-  renderWeekDetail(detailWeekId);
-  renderHistory();
-  showToast('Даты обновлены');
-}
-
-function calcTotals(week) {
-  if (!week) return { earned:0, overtime:0, deductions:0, advance:0, overtimeHours:0, remainingHours:0 };
-  let earned = 0, overtimeHours = week.overtimeCarry || 0, deductions = 0, advance = 0;
-  for (const e of week.entries || []) {
-    if (e.type === 'workday') earned += 650;
-    if (e.type === 'short' || e.type === 'overtime') overtimeHours += e.hours;
-    if (e.type === 'deduction') deductions += e.amount;
-    if (e.type === 'advance') advance += e.amount;
-  }
-  const blocks = Math.floor(overtimeHours / 4);
-  const overtimePay = blocks * 300;
-  const remainingHours = +(overtimeHours - blocks * 4).toFixed(2);
-  return { earned, overtime: overtimePay, deductions, advance, overtimeHours, remainingHours,
-           total: earned + overtimePay - deductions };
-}
-
-function currentWeekId() { return getWeekId(); }
-
-function getWeek(wid) {
-  if (!data.weeks[wid]) data.weeks[wid] = { entries: [], overtimeCarry: 0 };
-  return data.weeks[wid];
-}
-
-function addEntry(wid, entry) {
-  const wk = getWeek(wid);
-  wk.entries.push({ ...entry, id: Date.now() });
-  saveData();
-  renderMain();
-}
-
-function removeEntry(wid, id) {
-  const wk = data.weeks[wid];
-  if (!wk) return;
-  wk.entries = wk.entries.filter(e => e.id !== id);
-  saveData();
-}
-
-// ── TYPE STYLES ───────────────────────────────────────────────────────────────
-
-const TS = {
-  workday:   { icon:'✓', color:'var(--green)',  bg:'rgba(74,222,128,0.07)' },
-  short:     { icon:'◑', color:'var(--yellow)', bg:'rgba(250,204,21,0.07)' },
-  overtime:  { icon:'⊕', color:'var(--orange)', bg:'rgba(251,146,60,0.07)' },
-  dayoff:    { icon:'○', color:'var(--muted)',  bg:'rgba(100,116,139,0.06)' },
-  deduction: { icon:'↓', color:'var(--red)',    bg:'rgba(248,113,113,0.07)' },
-  advance:   { icon:'↑', color:'var(--purple)', bg:'rgba(167,139,250,0.07)' },
-};
-
-// ── ACTIONS ───────────────────────────────────────────────────────────────────
-
-function addWorkday() {
-  addEntry(currentWeekId(), { type:'workday', label:'Рабочий день +650₴' });
-  showToast('+650₴ зачислено');
-}
-
-function addDayOff() {
-  addEntry(currentWeekId(), { type:'dayoff', label:'Выходной' });
-  showToast('Выходной отмечен');
-}
-
-function carryOvertime() {
-  const wid = currentWeekId();
-  const t = calcTotals(data.weeks[wid]);
-  if (!t.remainingHours) return;
-  const nextWid = getNextWeekId(wid);
-  const nw = getWeek(nextWid);
-  nw.overtimeCarry = +(( nw.overtimeCarry || 0) + t.remainingHours).toFixed(2);
-  saveData();
-  renderMain();
-  showToast(t.remainingHours + 'г перенесено на следующую неделю');
-}
-
-function getNextWeekId(wid) {
-  const monday = getMondayOfWeek(wid);
-  monday.setUTCDate(monday.getUTCDate() + 7);
-  return getWeekId(monday);
-}
-
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-
-const MODAL_CFG = {
-  short:     { title:'Неполный день', sub:'Сколько часов отработал? (1–7.5)\nОни пойдут в копилку переработки' },
-  overtime:  { title:'Переработка', sub:'Сколько часов сверхурочно?\n4г = 300₴ · 8г = 600₴' },
-  deduction: { title:'Вычет', sub:'Сумма вычета (₴)' },
-  advance:   { title:'Аванс', sub:'Сколько получил авансом (₴)?' },
-};
-
-function openModal(type) {
-  currentModal = type;
-  const cfg = MODAL_CFG[type];
-  document.getElementById('modal-title').textContent = cfg.title;
-  document.getElementById('modal-sub').textContent = cfg.sub;
-  document.getElementById('modal-input').value = '';
-  document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('modal-input').focus(), 300);
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  currentModal = null;
-}
-
-function modalConfirm() {
-  const val = parseFloat(document.getElementById('modal-input').value);
-  const wid = currentWeekId();
-  if (currentModal === 'short') {
-    if (!val || val <= 0 || val >= 8) { showToast('Введи часы от 0.5 до 7.5'); return; }
-    addEntry(wid, { type:'short', hours: val, label:`Неполный день ${val}г` });
-    showToast(`+${val}г в копилку`);
-  }
-  if (currentModal === 'overtime') {
-    if (!val || val <= 0) { showToast('Введи количество часов'); return; }
-    addEntry(wid, { type:'overtime', hours: val, label:`Переработка +${val}г` });
-    showToast(`+${val}г в копилку`);
-  }
-  if (currentModal === 'deduction') {
-    if (!val || val <= 0) { showToast('Введи сумму'); return; }
-    addEntry(wid, { type:'deduction', amount: val, label:`Вычет −${val}₴` });
-    showToast(`−${val}₴ вычет`);
-  }
-  if (currentModal === 'advance') {
-    if (!val || val <= 0) { showToast('Введи сумму'); return; }
-    addEntry(wid, { type:'advance', amount: val, label:`Аванс +${val}₴` });
-    showToast(`Аванс ${val}₴ зафиксирован`);
-  }
-  closeModal();
-}
-
-// ── DELETE ────────────────────────────────────────────────────────────────────
-
-function askDelete(wid, id, label) {
-  pendingDelete = { wid, id };
-  document.getElementById('del-sub').textContent = label;
-  document.getElementById('del-overlay').classList.add('open');
-}
-
-function confirmDelete() {
-  if (!pendingDelete) return;
-  removeEntry(pendingDelete.wid, pendingDelete.id);
-  closeDelModal();
-  if (detailWeekId) renderWeekDetail(detailWeekId);
-  else renderMain();
-  showToast('Удалено');
-}
-
-function closeDelModal() {
-  document.getElementById('del-overlay').classList.remove('open');
-  pendingDelete = null;
-}
-
-// ── PAGES ─────────────────────────────────────────────────────────────────────
-
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  if (name === 'main') renderMain();
-  if (name === 'history') renderHistory();
-}
-
-// ── RENDER MAIN ───────────────────────────────────────────────────────────────
-
-function renderMain() {
-  const wid = currentWeekId();
-  const wk = data.weeks[wid] || { entries: [], overtimeCarry: 0 };
-  const t = calcTotals(wk);
-
-  document.getElementById('main-week-label').textContent = getWeekLabel(wid);
-
-  // carry
-  const carryBadge = document.getElementById('carry-badge');
-  if (wk.overtimeCarry > 0) {
-    carryBadge.textContent = '↩ Перенесено с прошлой недели: ' + wk.overtimeCarry + 'г';
-    carryBadge.style.display = 'block';
-  } else carryBadge.style.display = 'none';
-
-  const net = t.earned + t.overtime - t.deductions;
-  document.getElementById('main-total').textContent = net;
-
-  // advance block
-  const advBlock = document.getElementById('advance-block');
-  if (t.advance > 0) {
-    advBlock.style.display = 'block';
-    document.getElementById('advance-sub-text').textContent = 'аванс −' + t.advance + '₴';
-    document.getElementById('to-receive-text').textContent = '= ' + (net - t.advance) + '₴';
-  } else advBlock.style.display = 'none';
-
-  // mini stats
-  document.getElementById('ms-days').textContent = (wk.entries||[]).filter(e=>e.type==='workday').length + ' дн';
-  document.getElementById('ms-ot').textContent = t.overtime + '₴';
-  document.getElementById('ms-rem').textContent = t.remainingHours + 'г';
-  if (t.deductions > 0) {
-    document.getElementById('ms-ded-block').style.display = '';
-    document.getElementById('ms-ded').textContent = '−' + t.deductions + '₴';
-  } else document.getElementById('ms-ded-block').style.display = 'none';
-
-  // carry button
-  const carryBtn = document.getElementById('carry-btn');
-  if (t.remainingHours > 0) {
-    carryBtn.textContent = 'Перенести ' + t.remainingHours + 'г на следующую неделю →';
-    carryBtn.style.display = 'block';
-  } else carryBtn.style.display = 'none';
-
-  // recent entries
-  const entries = wk.entries || [];
-  const recentBlock = document.getElementById('recent-block');
-  const recentList = document.getElementById('recent-list');
-  if (entries.length > 0) {
-    recentBlock.style.display = 'block';
-    const recent = [...entries].reverse().slice(0, 6);
-    recentList.innerHTML = recent.map(e => entryHTML(wid, e)).join('');
-  } else {
-    recentBlock.style.display = 'none';
-    recentList.innerHTML = '';
-  }
-}
-
-function entryHTML(wid, e) {
-  const ts = TS[e.type] || { icon:'?', color:'var(--muted)', bg:'rgba(255,255,255,0.03)' };
-  return `<div class="entry-row" style="background:${ts.bg}">
-    <span class="e-icon" style="color:${ts.color}">${ts.icon}</span>
-    <span class="e-label">${e.label}</span>
-    <button class="del-btn" onclick="askDelete('${wid}', ${e.id}, '${e.label.replace(/'/g,"\\'")}')">✕</button>
-  </div>`;
-}
-
-// ── RENDER HISTORY ────────────────────────────────────────────────────────────
-
-function renderHistory() {
-  const cards = document.getElementById('hist-cards');
-  const wids = Object.keys(data.weeks).sort((a,b) => b.localeCompare(a));
-  if (wids.length === 0) { cards.innerHTML = '<div class="empty">Нет записей</div>'; return; }
-  const cwid = currentWeekId();
-  cards.innerHTML = wids.map(wid => {
-    const wk = data.weeks[wid];
-    const t = calcTotals(wk);
-    const isCur = wid === cwid;
-    const typesSet = [...new Set((wk.entries||[]).map(e=>e.type))];
-    const net = t.earned + t.overtime - t.deductions;
-    return `<div class="hist-card ${isCur?'current':''}" onclick="openWeekDetail('${wid}')">
-      <div class="hist-card-top">
-        <div>
-          <div class="hist-wlbl">${getWeekLabel(wid)}</div>
-          ${isCur ? '<span class="hist-badge">текущая</span>' : ''}
-        </div>
-        <div>
-          <div class="hist-amount" style="color:var(--text)">${net}₴</div>
-          ${t.advance>0 ? `<div class="hist-adv">аванс −${t.advance}₴</div>` : ''}
-        </div>
+  labelEl.style.display='block';footerEl.style.display='flex';
+  listEl.innerHTML=items.map(i=>`
+    <div class="item-card">
+      <div class="item-dot" style="background:${catColor(i.cat)}"></div>
+      <div class="item-info">
+        <div class="item-name">${esc(i.name)}</div>
+        ${i.qty>1
+          ? `<div class="item-sub">${i.qty} шт × ${i.price.toFixed(2)} ₴</div>`
+          : `<div class="item-sub">${catShort(i.cat)}</div>`
+        }
       </div>
-      <div class="hist-types">
-        ${typesSet.map(tp => `<span class="hist-type-dot" style="color:${(TS[tp]||{}).color||'var(--muted)'}">
-          ${(TS[tp]||{}).icon||'?'} ${(wk.entries||[]).filter(e=>e.type===tp).length}</span>`).join('')}
-        ${(wk.overtimeCarry||0)>0 ? `<span class="hist-type-dot" style="color:var(--orange)">↩ ${wk.overtimeCarry}г</span>` : ''}
+      <div class="item-right">
+        <div class="item-total">${i.total.toFixed(2)}<span class="item-cur">₴</span></div>
+        ${i.qty>1 ? `<span class="item-cat-tag">${catShort(i.cat)}</span>` : ''}
+      </div>
+      <button class="btn-del" onclick="deleteItem(${i.id})">✕</button>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════
+   Save modal
+════════════════════════════════════════ */
+function openSaveModal(){
+  if(!items.length)return;
+  const total=items.reduce((s,i)=>s+i.total,0);
+  document.getElementById('modal-sub').textContent=
+    items.length+' '+plural(items.length,'позиция','позиции','позиций')+' · '+total.toFixed(2)+' ₴';
+  const now=new Date();
+  document.getElementById('modal-label').value=
+    now.toLocaleDateString('uk-UA',{day:'numeric',month:'long'});
+  document.getElementById('modal-note').value='';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-label').select(),200);
+}
+function closeModalDirect(){document.getElementById('modal-bg').classList.remove('open');}
+function closeModal(e){if(e.target===document.getElementById('modal-bg'))closeModalDirect();}
+
+async function saveReceipt(){
+  const label=document.getElementById('modal-label').value.trim();
+  if(!label){document.getElementById('modal-label').focus();return;}
+  const note=document.getElementById('modal-note').value.trim();
+  const now=new Date();
+  const receipt={
+    id: Date.now(),
+    label,
+    note: note||null,
+    date: now.toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'}),
+    total: items.reduce((s,i)=>s+i.total,0),
+    items: [...items]
+  };
+  await dbAdd(receipt);
+  items=[];lsSet(SK_ITEMS,items);
+  closeModalDirect();
+  renderList();
+  showToast('✅ Чек сохранён в базу');
+  switchTab('history');
+}
+
+/* ════════════════════════════════════════
+   Render History
+════════════════════════════════════════ */
+async function renderHistory(){
+  const receipts = await dbGetAll();
+  const now = Date.now();
+  const wk  = now-7*24*3600*1000;
+  const mo  = now-30*24*3600*1000;
+  const sumW=receipts.filter(r=>r.id>wk).reduce((s,r)=>s+r.total,0);
+  const sumM=receipts.filter(r=>r.id>mo).reduce((s,r)=>s+r.total,0);
+
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat-card">
+      <div class="stat-label">За 7 дней</div>
+      <div class="stat-val">${sumW.toFixed(0)}<span style="font-size:14px;color:var(--muted)"> ₴</span></div>
+      <div class="stat-sub">${receipts.filter(r=>r.id>wk).length} чеков</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">За 30 дней</div>
+      <div class="stat-val">${sumM.toFixed(0)}<span style="font-size:14px;color:var(--muted)"> ₴</span></div>
+      <div class="stat-sub">${receipts.filter(r=>r.id>mo).length} чеков</div>
+    </div>`;
+
+  // DB info
+  document.getElementById('db-badge').textContent =
+    `📦 IndexedDB · ${receipts.length} ${plural(receipts.length,'чек','чека','чеков')} сохранено`;
+
+  const el=document.getElementById('history-list');
+  if(!receipts.length){
+    el.innerHTML='<div class="no-history"><div class="empty-icon">📋</div>Пока нет сохранённых чеков</div>';
+    return;
+  }
+  el.innerHTML=receipts.map(r=>{
+    // category breakdown
+    const catTotals={};
+    r.items.forEach(i=>{
+      catTotals[i.cat]=(catTotals[i.cat]||0)+i.total;
+    });
+    const rTotal=r.total||1;
+    const breakdown=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).map(([cid,val])=>`
+      <div class="cat-row">
+        <div class="cat-row-dot" style="background:${catColor(cid)}"></div>
+        <div class="cat-row-name">${catShort(cid)}</div>
+        <div class="cat-row-bar-bg">
+          <div class="cat-row-bar" style="width:${(val/rTotal*100).toFixed(0)}%;background:${catColor(cid)}"></div>
+        </div>
+        <div class="cat-row-val">${val.toFixed(0)} ₴</div>
+      </div>`).join('');
+
+    return `
+    <div class="receipt-card">
+      <div class="receipt-head" onclick="toggleR(${r.id})">
+        <div class="receipt-icon">🧾</div>
+        <div class="receipt-info">
+          <div class="receipt-name">${esc(r.label)}</div>
+          <div class="receipt-meta">${r.date} · ${r.items.length} ${plural(r.items.length,'товар','товара','товаров')}</div>
+        </div>
+        <div class="receipt-total">${r.total.toFixed(2)} ₴</div>
+        <div class="receipt-arrow" id="arr-${r.id}">▼</div>
+      </div>
+      <div class="receipt-body" id="rb-${r.id}">
+        ${r.note?`<div class="receipt-note">📝 ${esc(r.note)}</div>`:''}
+        ${r.items.map(i=>`
+          <div class="r-item">
+            <div class="r-dot" style="background:${catColor(i.cat)}"></div>
+            <div class="r-info">
+              <div class="r-name">${esc(i.name)}</div>
+              ${i.qty>1?`<div class="r-qty-line">${i.qty} шт × ${i.price.toFixed(2)} ₴</div>`:''}
+            </div>
+            <span class="r-cat">${catShort(i.cat)}</span>
+            <div class="r-price">${i.total.toFixed(2)}<span class="r-cur">₴</span></div>
+          </div>`).join('')}
+        <div class="cat-breakdown">
+          <div class="cat-breakdown-title">По категориям</div>
+          ${breakdown}
+        </div>
+        <div class="receipt-actions">
+          <button class="btn-receipt-del" onclick="deleteReceipt(${r.id})">🗑 Удалить чек</button>
+        </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── WEEK DETAIL ───────────────────────────────────────────────────────────────
-
-function openWeekDetail(wid) {
-  detailWeekId = wid;
-  document.getElementById('date-edit-row').style.display = 'none';
-  renderWeekDetail(wid);
-  showPage('week');
+function toggleR(id){
+  const b=document.getElementById('rb-'+id);
+  const a=document.getElementById('arr-'+id);
+  const o=b.classList.toggle('open');
+  a.classList.toggle('open',o);
 }
 
-function renderWeekDetail(wid) {
-  const wk = data.weeks[wid] || { entries:[], overtimeCarry:0 };
-  const t = calcTotals(wk);
-  const net = t.earned + t.overtime - t.deductions;
-
-  document.getElementById('wd-title').textContent = getWeekLabel(wid);
-
-  const cb = document.getElementById('wd-carry-badge');
-  if ((wk.overtimeCarry||0) > 0) {
-    cb.textContent = '↩ Перенесено с прошлой недели: ' + wk.overtimeCarry + 'г';
-    cb.style.display = 'block';
-  } else cb.style.display = 'none';
-
-  // summary
-  let rows = `<div class="wd-row"><span class="wd-row-lbl">Рабочих дней</span><span class="wd-row-val" style="color:var(--green)">${(wk.entries||[]).filter(e=>e.type==='workday').length} × 650₴</span></div>`;
-  rows += `<div class="wd-row"><span class="wd-row-lbl">Переработка</span><span class="wd-row-val" style="color:var(--orange)">${t.overtime}₴</span></div>`;
-  if (t.deductions > 0) rows += `<div class="wd-row"><span class="wd-row-lbl">Вычеты</span><span class="wd-row-val" style="color:var(--red)">−${t.deductions}₴</span></div>`;
-  if (t.advance > 0) rows += `<div class="wd-row"><span class="wd-row-lbl">Аванс</span><span class="wd-row-val" style="color:var(--purple)">${t.advance}₴</span></div>`;
-  rows += `<div class="divider"></div>`;
-  rows += `<div class="wd-row big"><span class="wd-row-lbl">Заработано</span><span class="wd-row-val" style="color:var(--text)">${net}₴</span></div>`;
-  if (t.advance > 0) rows += `<div class="wd-row big"><span class="wd-row-lbl">К получению</span><span class="wd-row-val" style="color:var(--green)">${net - t.advance}₴</span></div>`;
-  if (t.remainingHours > 0) rows += `<div style="font-size:12px;color:var(--muted2);margin-top:4px">↩ Остаток переработки: ${t.remainingHours}г</div>`;
-  document.getElementById('wd-summary').innerHTML = rows;
-
-  // entries
-  const entries = wk.entries || [];
-  document.getElementById('wd-entries').innerHTML = entries.length === 0
-    ? '<div class="empty">Нет записей</div>'
-    : [...entries].reverse().map(e => entryHTML(wid, e)).join('');
+async function deleteReceipt(id){
+  if(!confirm('Удалить этот чек?'))return;
+  await dbDel(id);
+  renderHistory();
 }
 
-// ── EXPORT / IMPORT ───────────────────────────────────────────────────────────
-
-function exportData() {
-  const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const today = new Date();
-  const d = String(today.getDate()).padStart(2,'0');
-  const m = String(today.getMonth()+1).padStart(2,'0');
-  const y = today.getFullYear();
-  a.href = url;
-  a.download = `зарплата_${d}-${m}-${y}.json`;
+/* ════════════════════════════════════════
+   Export / Import JSON
+════════════════════════════════════════ */
+async function exportJSON(){
+  const receipts=await dbGetAll();
+  if(!receipts.length){showToast('Нечего экспортировать');return;}
+  const data={version:1,exported:new Date().toISOString(),receipts};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='expenses_'+new Date().toLocaleDateString('uk-UA').replace(/\./g,'-')+'.json';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('Данные экспортированы');
+  showToast('✅ Экспорт выполнен');
 }
 
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (!imported.weeks) { showToast('Неверный формат файла'); return; }
-      data.weeks = { ...data.weeks, ...imported.weeks };
-      saveData();
-      renderHistory();
-      showToast('Данные загружены ✓');
-    } catch { showToast('Ошибка чтения файла'); }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
+async function importJSON(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  e.target.value='';
+  try{
+    const text=await file.text();
+    const data=JSON.parse(text);
+    const list=data.receipts||data; // support both formats
+    if(!Array.isArray(list))throw new Error('bad format');
+    let added=0;
+    for(const r of list){
+      if(!r.id||!r.label)continue;
+      try{await dbPut(r);added++;}catch(err){}
+    }
+    showToast(`✅ Импортировано: ${added} чеков`);
+    renderHistory();
+  }catch(err){
+    showToast('❌ Ошибка чтения файла');
+  }
 }
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
+/* ════════════════════════════════════════
+   Utils
+════════════════════════════════════════ */
+function plural(n,a,b,c){
+  if(n===null||n===undefined)return c;
+  const m=n%100;if(m>=11&&m<=14)return c;
+  const e=n%10;if(e===1)return a;if(e>=2&&e<=4)return b;return c;
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-let toastTimer = null;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+/* ════════════════════════════════════════
+   Keyboard
+════════════════════════════════════════ */
+document.getElementById('inp-name').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-qty').focus();});
+document.getElementById('inp-qty').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-price').focus();});
+document.getElementById('inp-price').addEventListener('keydown',e=>{if(e.key==='Enter')addItem();});
+document.getElementById('modal-label').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('modal-note').focus();});
+document.getElementById('modal-note').addEventListener('keydown',e=>{if(e.key==='Enter')saveReceipt();});
 
-renderMain();
+/* ════════════════════════════════════════
+   Init
+════════════════════════════════════════ */
+openDB().then(()=>{
+  renderCats();
+  if(budget) document.getElementById('budget-inp').placeholder='Бюджет: '+budget+' ₴';
+  renderList();
+}).catch(err=>{
+  console.error('DB error:',err);
+  showToast('⚠️ Ошибка базы данных');
+});
 </script>
 </body>
 </html>
